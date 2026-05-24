@@ -55,7 +55,7 @@ export default function CaptureButton() {
   return (
     <button
       onClick={handleCapture}
-      className="fixed bottom-4 right-4 z-[9999] p-3 bg-teal-500 text-white rounded-full shadow-lg hover:bg-teal-600 hover:scale-105 active:scale-95 transition-all opacity-80 hover:opacity-100"
+      className="fixed bottom-24 right-4 z-[9999] p-3 bg-teal-500 text-white rounded-full shadow-lg hover:bg-teal-600 hover:scale-105 active:scale-95 transition-all opacity-80 hover:opacity-100 sm:bottom-4"
       title="Ambil Gambar Layar"
     >
       <Camera className="w-5 h-5" />

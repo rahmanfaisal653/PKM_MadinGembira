@@ -8,6 +8,7 @@ import InteractiveZonePage from './pages/InteractiveZonePage';
 import TajwidPage from './pages/TajwidPage';
 import JuzAmmaPage from './pages/JuzAmmaPage';
 import CaptureButton from './components/CaptureButton';
+import MobileBottomNav from './components/MobileBottomNav';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/tajwid" element={<TajwidPage />} />
           <Route path="/juz-amma" element={<JuzAmmaPage />} />
         </Routes>
+        <MobileBottomNav />
       </HashRouter>
       <CaptureButton />
     </>
