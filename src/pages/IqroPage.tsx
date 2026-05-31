@@ -215,66 +215,107 @@ export default function IqroPage() {
         </div>
 
         {/* Book Container */}
-        <div className="w-full relative perspective-1000">
+        <div className="w-full relative">
           <AnimatePresence mode="wait">
             <motion.div
               key={`${jilid}-${page}`}
-              initial={{ rotateY: 90, opacity: 0, originX: 1 }}
-              animate={{ rotateY: 0, opacity: 1, originX: 1 }}
-              exit={{ rotateY: -90, opacity: 0, originX: 0 }}
-              transition={{ duration: 0.5, type: 'spring' }}
-              className="w-full bg-white rounded-[2rem] border-4 border-emerald-200 shadow-2xl p-6 md:p-12 min-h-[60vh] flex flex-col relative"
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="w-full rounded-2xl shadow-2xl overflow-hidden"
+              style={{ background: '#FFFEF5', border: '2px solid #d4c9a0' }}
             >
-              {/* Binder rings illustration */}
-              <div className="flex justify-between items-center border-b-4 border-emerald-100 pb-4 mb-8">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-600" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif' }}>Iqro Jilid {jilid}</h2>
-                <span className="bg-emerald-100 text-emerald-700 px-3 py-1 sm:px-4 sm:py-2 rounded-xl border-2 border-emerald-200 font-bold block text-sm sm:text-base">Halaman {page}</span>
+              {/* Book header — mirip header halaman Iqro asli */}
+              <div className="flex items-center justify-between px-6 md:px-10 py-3 border-b-2" style={{ borderColor: '#d4c9a0', background: '#F5F0DC' }}>
+                <span className="font-black text-sm md:text-base tracking-widest uppercase" style={{ color: '#5a4a1a', fontFamily: 'Nunito, sans-serif' }}>
+                  IQRO&apos; {jilid}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs md:text-sm font-bold" style={{ color: '#8a7a3a' }}>Halaman</span>
+                  <span className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center font-black text-sm md:text-base" style={{ background: '#5a4a1a', color: '#FFFEF5' }}>
+                    {page}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex-grow flex flex-col justify-center w-full max-w-5xl mx-auto px-0 sm:px-4 md:px-8 py-4">
+              {/* Content area */}
+              <div className="px-4 md:px-10 py-6 md:py-8 min-h-[55vh] flex flex-col justify-center">
                 {currentPageData && (
-                  <div className="w-full flex flex-col gap-3 sm:gap-4 md:gap-6" dir="rtl">
-                    {currentPageData.content.split('\n\n').map((row, idx) => {
-                      if(!row.trim()) return null;
-                      return (
-                        <div key={idx} className="flex justify-between items-center w-full border-b-2 border-emerald-100/50 py-2 sm:py-3 last:border-0 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-arabic leading-relaxed text-emerald-900">
-                          {row.split('      ').map((word, wIdx, arr) => (
-                            <React.Fragment key={wIdx}>
-                              <span className="flex-1 text-center font-medium tracking-normal sm:tracking-wide px-0.5 sm:px-1">{word}</span>
-                              {wIdx < arr.length - 1 && <span className="text-emerald-200 text-xs sm:text-lg select-none mx-0.5 sm:mx-3 flex-shrink-0">◈</span>}
-                            </React.Fragment>
-                          ))}
-                        </div>
-                      )
-                    })}
+                  <div className="w-full flex flex-col gap-0" dir="rtl">
+                    {currentPageData.content.split('\n\n').filter(r => r.trim()).map((row, idx, arr) => (
+                      <div
+                        key={idx}
+                        className="flex justify-around items-center w-full py-3 md:py-4"
+                        style={{ borderBottom: idx < arr.length - 1 ? '1px solid #e8e0c0' : 'none' }}
+                      >
+                        {row.split('      ').map((word, wIdx) => (
+                          <span
+                            key={wIdx}
+                            className="flex-1 text-center"
+                            style={{
+                              fontFamily: '"Amiri", "Traditional Arabic", serif',
+                              fontSize: 'clamp(1.6rem, 4vw, 2.8rem)',
+                              lineHeight: '1.6',
+                              color: '#1a1a1a',
+                              fontWeight: 700,
+                              letterSpacing: '0.02em',
+                            }}
+                          >
+                            {word}
+                          </span>
+                        ))}
+                      </div>
+                    ))}
                   </div>
                 )}
+              </div>
+
+              {/* Book footer */}
+              <div className="flex items-center justify-between px-6 md:px-10 py-3 border-t-2" style={{ borderColor: '#d4c9a0', background: '#F5F0DC' }}>
+                {/* Progress dots */}
+                <div className="flex gap-1">
+                  {Array.from({ length: 20 }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setPage(i + 1)}
+                      className="rounded-full transition-all"
+                      style={{
+                        width: i + 1 === page ? '20px' : '8px',
+                        height: '8px',
+                        background: i + 1 === page ? '#5a4a1a' : i + 1 < page ? '#a89050' : '#d4c9a0',
+                      }}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs font-bold" style={{ color: '#8a7a3a' }}>{page} / 20</span>
               </div>
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation Controls Overlayed for easy access */}
-          <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 hidden sm:flex justify-between z-30 pointer-events-none px-0 sm:-mx-6 md:-mx-12">
-            <button 
-              onClick={prevPage}
-              disabled={page === 1}
-              className={`pointer-events-auto p-2 sm:p-4 rounded-full bg-emerald-400 text-white shadow-xl transition-all ${page === 1 ? 'opacity-0' : 'hover:-translate-x-2 hover:bg-emerald-500'}`}
-            >
-              <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
-            </button>
-            <button 
-              onClick={nextPage}
-              disabled={page === 20}
-              className={`pointer-events-auto p-2 sm:p-4 rounded-full bg-emerald-400 text-white shadow-xl transition-all ${page === 20 ? 'opacity-0' : 'hover:translate-x-2 hover:bg-emerald-500'}`}
-            >
-              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
-            </button>
-          </div>
+          {/* Side navigation arrows — desktop */}
+          <button
+            onClick={prevPage}
+            disabled={page === 1}
+            className="absolute top-1/2 -translate-y-1/2 -left-5 md:-left-14 hidden sm:flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg transition-all disabled:opacity-0"
+            style={{ background: '#5a4a1a', color: '#FFFEF5' }}
+          >
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+          <button
+            onClick={nextPage}
+            disabled={page === 20}
+            className="absolute top-1/2 -translate-y-1/2 -right-5 md:-right-14 hidden sm:flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg transition-all disabled:opacity-0"
+            style={{ background: '#5a4a1a', color: '#FFFEF5' }}
+          >
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
         </div>
 
-        <div className="mt-8 flex gap-4 md:hidden w-full px-2 relative z-20 pb-10">
-           <button onClick={prevPage} disabled={page === 1} className="flex-1 bg-emerald-200 text-emerald-700 py-3 rounded-2xl font-bold border-4 border-emerald-300 disabled:opacity-50">Sebelumnya</button>
-           <button onClick={nextPage} disabled={page === 20} className="flex-1 bg-emerald-400 text-white py-3 rounded-2xl font-bold border-4 border-emerald-500 disabled:opacity-50">Berikutnya</button>
+        {/* Mobile navigation */}
+        <div className="mt-5 flex gap-3 sm:hidden w-full pb-4">
+          <button onClick={prevPage} disabled={page === 1} className="flex-1 py-3 rounded-2xl font-bold text-sm border-2 disabled:opacity-40 transition-all" style={{ background: '#F5F0DC', color: '#5a4a1a', borderColor: '#d4c9a0' }}>← Sebelumnya</button>
+          <button onClick={nextPage} disabled={page === 20} className="flex-1 py-3 rounded-2xl font-bold text-sm border-2 disabled:opacity-40 transition-all" style={{ background: '#5a4a1a', color: '#FFFEF5', borderColor: '#3a2a0a' }}>Berikutnya →</button>
         </div>
           </>
         )}
