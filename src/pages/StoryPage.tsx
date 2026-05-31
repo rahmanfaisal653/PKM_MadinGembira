@@ -1,256 +1,301 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Star, Calendar, MapPin, Smile, Sun, Cloud, Heart } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowLeft, BookOpen, Star, Calendar, MapPin, Heart, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { KISAH_NABI, Nabi } from '../data/kisahNabi';
 import BackgroundDecorations from '../components/BackgroundDecorations';
 
-// helper for color map
-const getColorClass = (color: string) => {
-  const map: Record<string, string> = {
-    emerald: 'bg-emerald-100 text-emerald-600 border-emerald-200 from-emerald-400 to-emerald-600 shadow-emerald-200',
-    blue: 'bg-blue-100 text-blue-600 border-blue-200 from-blue-400 to-blue-600 shadow-blue-200',
-    cyan: 'bg-cyan-100 text-cyan-600 border-cyan-200 from-cyan-400 to-cyan-600 shadow-cyan-200',
-    orange: 'bg-orange-100 text-orange-600 border-orange-200 from-orange-400 to-orange-600 shadow-orange-200',
-    stone: 'bg-stone-100 text-stone-600 border-stone-200 from-stone-400 to-stone-600 shadow-stone-200',
-    red: 'bg-red-100 text-red-600 border-red-200 from-red-400 to-red-600 shadow-red-200',
-    purple: 'bg-purple-100 text-purple-600 border-purple-200 from-purple-400 to-purple-600 shadow-purple-200',
-    amber: 'bg-amber-100 text-amber-600 border-amber-200 from-amber-400 to-amber-600 shadow-amber-200',
-    teal: 'bg-teal-100 text-teal-600 border-teal-200 from-teal-400 to-teal-600 shadow-teal-200',
-    indigo: 'bg-indigo-100 text-indigo-600 border-indigo-200 from-indigo-400 to-indigo-600 shadow-indigo-200',
-    sky: 'bg-sky-100 text-sky-600 border-sky-200 from-sky-400 to-sky-600 shadow-sky-200',
-    fuchsia: 'bg-fuchsia-100 text-fuchsia-600 border-fuchsia-200 from-fuchsia-400 to-fuchsia-600 shadow-fuchsia-200',
-    lime: 'bg-lime-100 text-lime-600 border-lime-200 from-lime-400 to-lime-600 shadow-lime-200',
-    yellow: 'bg-yellow-100 text-yellow-600 border-yellow-200 from-yellow-400 to-yellow-600 shadow-yellow-200',
-    rose: 'bg-rose-100 text-rose-600 border-rose-200 from-rose-400 to-rose-600 shadow-rose-200',
-  };
-  return map[color] || map['sky'];
+const COLOR_MAP: Record<string, { bg: string; light: string; text: string; border: string; btn: string; btnBorder: string }> = {
+  emerald: { bg: 'from-emerald-400 to-emerald-600', light: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', btn: 'bg-emerald-500 hover:bg-emerald-600', btnBorder: 'border-emerald-700' },
+  blue:    { bg: 'from-blue-400 to-blue-600',       light: 'bg-blue-50',    text: 'text-blue-700',    border: 'border-blue-200',    btn: 'bg-blue-500 hover:bg-blue-600',       btnBorder: 'border-blue-700' },
+  cyan:    { bg: 'from-cyan-400 to-cyan-600',       light: 'bg-cyan-50',    text: 'text-cyan-700',    border: 'border-cyan-200',    btn: 'bg-cyan-500 hover:bg-cyan-600',       btnBorder: 'border-cyan-700' },
+  orange:  { bg: 'from-orange-400 to-orange-600',   light: 'bg-orange-50',  text: 'text-orange-700',  border: 'border-orange-200',  btn: 'bg-orange-500 hover:bg-orange-600',   btnBorder: 'border-orange-700' },
+  stone:   { bg: 'from-stone-400 to-stone-600',     light: 'bg-stone-50',   text: 'text-stone-700',   border: 'border-stone-200',   btn: 'bg-stone-500 hover:bg-stone-600',     btnBorder: 'border-stone-700' },
+  red:     { bg: 'from-red-400 to-red-600',         light: 'bg-red-50',     text: 'text-red-700',     border: 'border-red-200',     btn: 'bg-red-500 hover:bg-red-600',         btnBorder: 'border-red-700' },
+  purple:  { bg: 'from-purple-400 to-purple-600',   light: 'bg-purple-50',  text: 'text-purple-700',  border: 'border-purple-200',  btn: 'bg-purple-500 hover:bg-purple-600',   btnBorder: 'border-purple-700' },
+  amber:   { bg: 'from-amber-400 to-amber-600',     light: 'bg-amber-50',   text: 'text-amber-700',   border: 'border-amber-200',   btn: 'bg-amber-500 hover:bg-amber-600',     btnBorder: 'border-amber-700' },
+  teal:    { bg: 'from-teal-400 to-teal-600',       light: 'bg-teal-50',    text: 'text-teal-700',    border: 'border-teal-200',    btn: 'bg-teal-500 hover:bg-teal-600',       btnBorder: 'border-teal-700' },
+  indigo:  { bg: 'from-indigo-400 to-indigo-600',   light: 'bg-indigo-50',  text: 'text-indigo-700',  border: 'border-indigo-200',  btn: 'bg-indigo-500 hover:bg-indigo-600',   btnBorder: 'border-indigo-700' },
+  sky:     { bg: 'from-sky-400 to-sky-600',         light: 'bg-sky-50',     text: 'text-sky-700',     border: 'border-sky-200',     btn: 'bg-sky-500 hover:bg-sky-600',         btnBorder: 'border-sky-700' },
+  fuchsia: { bg: 'from-fuchsia-400 to-fuchsia-600', light: 'bg-fuchsia-50', text: 'text-fuchsia-700', border: 'border-fuchsia-200', btn: 'bg-fuchsia-500 hover:bg-fuchsia-600', btnBorder: 'border-fuchsia-700' },
+  lime:    { bg: 'from-lime-400 to-lime-600',       light: 'bg-lime-50',    text: 'text-lime-700',    border: 'border-lime-200',    btn: 'bg-lime-500 hover:bg-lime-600',       btnBorder: 'border-lime-700' },
+  yellow:  { bg: 'from-yellow-400 to-yellow-500',   light: 'bg-yellow-50',  text: 'text-yellow-700',  border: 'border-yellow-200',  btn: 'bg-yellow-400 hover:bg-yellow-500',   btnBorder: 'border-yellow-600' },
+  rose:    { bg: 'from-rose-400 to-rose-600',       light: 'bg-rose-50',    text: 'text-rose-700',    border: 'border-rose-200',    btn: 'bg-rose-500 hover:bg-rose-600',       btnBorder: 'border-rose-700' },
 };
+const getColor = (c: string) => COLOR_MAP[c] ?? COLOR_MAP['sky'];
 
 export default function StoryPage() {
   const navigate = useNavigate();
   const [selectedStory, setSelectedStory] = useState<Nabi | null>(null);
   const [page, setPage] = useState(0);
+  const [direction, setDirection] = useState(1);
 
   const openStory = (story: Nabi) => {
     setSelectedStory(story);
     setPage(0);
   };
 
+  const closeStory = () => {
+    setSelectedStory(null);
+    setPage(0);
+  };
+
+  const goNext = (total: number) => {
+    setDirection(1);
+    setPage(p => Math.min(total - 1, p + 1));
+  };
+
+  const goPrev = () => {
+    setDirection(-1);
+    setPage(p => Math.max(0, p - 1));
+  };
+
   return (
-    <div className="min-h-screen bg-sky-50 flex flex-col font-sans overflow-x-hidden relative">
+    <div className="min-h-screen bg-gradient-to-b from-sky-100 to-indigo-50 flex flex-col font-sans overflow-x-hidden relative">
       <BackgroundDecorations />
 
-      <div className="bg-white border-b-4 border-sky-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 h-20 flex items-center justify-between">
-          <button 
-            onClick={() => {
-              if (selectedStory) setSelectedStory(null);
-              else navigate('/');
-            }}
-            className="flex items-center gap-2 text-sky-700 bg-sky-100 hover:bg-sky-200 hover:-translate-y-1 px-5 py-2.5 rounded-full font-bold transition-all shadow-sm border-b-4 border-sky-300 active:border-b-0 active:translate-y-1"
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur border-b-4 border-sky-200 sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
+          <button
+            onClick={() => selectedStory ? closeStory() : navigate('/')}
+            className="flex items-center gap-2 text-sky-700 bg-sky-100 hover:bg-sky-200 px-4 py-2 rounded-full font-bold transition-all shadow-sm border-b-4 border-sky-300 active:border-b-0 active:translate-y-0.5 text-sm md:text-base"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Kembali</span>
+            <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
+            <span>{selectedStory ? 'Daftar Nabi' : 'Kembali'}</span>
           </button>
-          <div className="flex items-center gap-2 text-sky-500 font-black text-xl" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif' }}>
-            <Smile className="w-7 h-7 text-sky-400" />
-            <span>Kisah Nabi</span>
+          <div className="flex items-center gap-2 text-sky-600 font-black text-lg md:text-xl" style={{ fontFamily: '"Nunito", "Comic Sans MS", sans-serif' }}>
+            <BookOpen className="w-6 h-6 text-sky-400" />
+            <span>Kisah Para Nabi</span>
           </div>
         </div>
       </div>
 
-      <main className="flex-grow max-w-5xl mx-auto w-full px-4 md:px-8 py-6 lg:py-10 relative z-10">
-        
+      <main className="flex-grow max-w-5xl mx-auto w-full px-4 md:px-8 py-6 relative z-10">
+
+        {/* ── STORY LIST ── */}
         {!selectedStory && (
-          <div className="mb-10 text-center bg-white p-8 rounded-[2.5rem] border-4 border-sky-200 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-100 rounded-bl-full -z-10"></div>
-            <div className="inline-flex items-center justify-center bg-sky-100 p-4 rounded-full mb-4 border-4 border-sky-50">
-               <BookOpen className="w-10 h-10 text-sky-500" />
+          <>
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow border-2 border-sky-100 mb-4">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+                <span className="font-black text-sky-700 text-lg">25 Kisah Nabi &amp; Rasul</span>
+                <Sparkles className="w-5 h-5 text-amber-400" />
+              </div>
+              <p className="text-sky-600 font-semibold text-base md:text-lg">Pilih nabi yang ingin kamu baca kisahnya!</p>
             </div>
-            <h1 className="text-3xl md:text-5xl font-black text-sky-600 mb-4" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif' }}>Kisah Terbaik Para Nabi</h1>
-            <p className="text-sky-800/70 font-bold text-lg md:text-xl">Mari mengenal sosok hebat manusia utusan Allah!</p>
-          </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {KISAH_NABI.map((story, idx) => {
+                const c = getColor(story.themeColor);
+                return (
+                  <motion.button
+                    key={story.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: (idx % 12) * 0.04, type: 'spring', stiffness: 200 }}
+                    whileHover={{ y: -6, scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => openStory(story)}
+                    className="bg-white rounded-3xl shadow-md border-2 border-gray-100 overflow-hidden flex flex-col text-left group focus:outline-none focus:ring-4 focus:ring-sky-300"
+                  >
+                    {/* Card illustration area */}
+                    <div className={`w-full h-28 md:h-36 bg-gradient-to-br ${c.bg} flex items-center justify-center relative overflow-hidden`}>
+                      <div className="absolute inset-0 bg-white/10"></div>
+                      <BookOpen className="w-12 h-12 md:w-16 md:h-16 text-white/90 drop-shadow" />
+                      <span className="absolute bottom-1 right-3 text-5xl font-bold text-white/20 select-none leading-none">{story.name.charAt(0)}</span>
+                    </div>
+                    {/* Card info */}
+                    <div className="p-3 md:p-4 flex flex-col gap-1 flex-grow">
+                      <p className="font-black text-gray-800 text-base md:text-lg leading-tight" style={{ fontFamily: '"Nunito", "Comic Sans MS", sans-serif' }}>
+                        Nabi {story.name}
+                      </p>
+                      <p className={`text-xs font-semibold ${c.text} flex items-center gap-1`}>
+                        <MapPin className="w-3 h-3 shrink-0" />{story.tmp}
+                      </p>
+                      <p className={`mt-2 text-xs font-bold ${c.text} ${c.light} px-2 py-1 rounded-full w-fit`}>
+                        Baca Kisah →
+                      </p>
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </>
         )}
 
-        {!selectedStory ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {KISAH_NABI.map((story, idx) => (
-              <motion.div
-                key={story.name || idx}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: (idx % 15) * 0.05, type: 'spring' }}
-                whileHover={{ y: -8, scale: 1.02, rotate: idx % 2 === 0 ? 2 : -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => openStory(story)}
-                className="bg-white p-6 rounded-[2.5rem] border-4 border-sky-100 shadow-lg cursor-pointer transform transition-all group flex flex-col"
-              >
-                <div className={`w-full h-40 bg-gradient-to-br ${getColorClass(story.themeColor).split(' ').find(c => c.startsWith('from-'))} ${getColorClass(story.themeColor).split(' ').find(c => c.startsWith('to-'))} rounded-[1.5rem] overflow-hidden mb-6 border-4 border-white shadow-sm mx-auto relative flex items-center justify-center p-4`}>
-                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <BookOpen className="w-16 h-16 text-white opacity-80" />
-                  <span className="absolute bottom-2 right-4 text-6xl font-arabic text-white/30 font-bold select-none">{story.name.charAt(0)}</span>
+        {/* ── STORY READER ── */}
+        {selectedStory && (() => {
+          const c = getColor(selectedStory.themeColor);
+          const paragraphs = selectedStory.description.split('\n').filter(p => p.trim());
+          const totalPages = paragraphs.length + 1; // 0 = cover, 1..n = paragraf
+
+          return (
+            <div className="flex flex-col items-center gap-6">
+
+              {/* Progress bar */}
+              <div className="w-full max-w-2xl">
+                <div className="flex justify-between text-xs font-bold text-sky-500 mb-1">
+                  <span>Halaman {page + 1} dari {totalPages}</span>
+                  <span>{Math.round(((page + 1) / totalPages) * 100)}%</span>
                 </div>
-                <h3 className="font-black text-3xl text-sky-800 mb-2 text-center" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif' }}>Nabi {story.name}</h3>
-                <p className="text-xs text-sky-600 font-bold mb-4 flex justify-center items-center gap-1 bg-sky-50 py-1.5 px-3 rounded-full w-fit mx-auto">
-                  <MapPin className="w-3 h-3" /> {story.tmp}
-                </p>
-                <p className="text-sm text-gray-500 text-center leading-relaxed font-medium mb-2 line-clamp-3">
-                  {story.description.split('\n')[0]}
-                </p>
-                
-                <div className="mt-auto pt-4 border-t-4 border-sky-50 text-center text-sky-500 font-bold text-sm md:text-base group-hover:text-sky-600 transition-colors">
-                  Mulai Baca Kisahnya →
+                <div className="w-full h-3 bg-white rounded-full border-2 border-sky-100 overflow-hidden">
+                  <motion.div
+                    className={`h-full bg-gradient-to-r ${c.bg} rounded-full`}
+                    animate={{ width: `${((page + 1) / totalPages) * 100}%` }}
+                    transition={{ type: 'spring', stiffness: 120 }}
+                  />
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <motion.div
-            key={selectedStory.name}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', damping: 20 }}
-            className="flex flex-col relative w-full items-center justify-center mt-4 md:mt-8"
-          >
-            <div className="w-full flex justify-between items-center mb-4 px-2">
-              <button 
-                onClick={() => {
-                  setSelectedStory(null);
-                  setPage(0);
-                }}
-                className="bg-rose-100 text-rose-600 hover:bg-rose-200 px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-colors border-2 border-rose-200"
-              >
-                ← Tutup Buku
-              </button>
-            </div>
-
-            {/* The Book Container */}
-            <div className="relative w-full max-w-5xl bg-[#fdfaf6] rounded-[2rem] md:rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] border-8 border-[#8B5A2B] overflow-hidden flex flex-col md:flex-row min-h-[600px] mb-8">
-              
-              {/* Book Spine (Hidden on mobile) */}
-              <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-12 -ml-6 bg-gradient-to-r from-transparent via-black/10 to-transparent z-20 pointer-events-none">
-                 {/* Binding stitches */}
-                 <div className="absolute top-12 left-1/2 w-4 h-1 bg-black/20 -translate-x-1/2"></div>
-                 <div className="absolute top-1/4 left-1/2 w-4 h-1 bg-black/20 -translate-x-1/2"></div>
-                 <div className="absolute top-2/4 left-1/2 w-4 h-1 bg-black/20 -translate-x-1/2"></div>
-                 <div className="absolute top-3/4 left-1/2 w-4 h-1 bg-black/20 -translate-x-1/2"></div>
-                 <div className="absolute bottom-12 left-1/2 w-4 h-1 bg-black/20 -translate-x-1/2"></div>
               </div>
 
-              {/* Left Page (Or Single Page on Mobile) */}
-              <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col relative z-10 border-b-2 md:border-b-0 md:border-r-2 border-gray-200 shadow-[inset_-20px_0_20px_-20px_rgba(0,0,0,0.05)]">
-                 {page === 0 ? (
-                   // Cover Page (Title and Info)
-                   <div className="flex flex-col h-full items-center justify-center text-center">
-                     <div className="w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center border-4 border-sky-200 shadow-sm mb-6">
-                       <Star className="w-12 h-12 text-sky-500 fill-sky-500" />
-                     </div>
-                     <h2 className="text-4xl md:text-5xl font-black text-sky-800 mb-6 leading-tight" style={{ fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif' }}>
-                       Kisah Nabi<br/>{selectedStory.name}
-                     </h2>
-                     <div className="bg-sky-50 border-4 border-sky-100 w-full rounded-3xl p-6 text-left space-y-4 shadow-inner">
-                       <div className="flex items-center gap-3 border-b-2 border-sky-100 pb-2">
-                         <MapPin className="w-6 h-6 text-sky-500" />
-                         <div>
-                           <p className="text-xs font-bold text-sky-500 uppercase">Diutus di</p>
-                           <p className="font-bold text-sky-900">{selectedStory.tmp}</p>
-                         </div>
-                       </div>
-                       <div className="flex items-center gap-3 border-b-2 border-sky-100 pb-2">
-                         <Calendar className="w-6 h-6 text-amber-500" />
-                         <div>
-                           <p className="text-xs font-bold text-amber-500 uppercase">Usia</p>
-                           <p className="font-bold text-sky-900">{selectedStory.usia} Tahun</p>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                 ) : (
-                   // Left Page Text
-                   <div className="flex flex-col h-full relative">
-                     <div className="absolute top-0 right-0 opacity-5 pointer-events-none">
-                       <BookOpen className="w-32 h-32" />
-                     </div>
-                     {(() => {
-                        const paragraphs = selectedStory.description.split('\n').filter(p => p.trim());
-                        const leftPara = paragraphs[(page - 1) * 2];
-                        return (
-                          <div className="prose prose-lg pt-4 md:pt-8 text-slate-800 leading-relaxed font-medium relative z-10">
-                            {leftPara ? <p className="first-letter:text-6xl first-letter:font-black first-letter:text-sky-600 first-letter:mr-2 first-letter:float-left">{leftPara}</p> : null}
+              {/* Story card */}
+              <div className="w-full max-w-2xl">
+                <AnimatePresence mode="wait" custom={direction}>
+                  <motion.div
+                    key={page}
+                    custom={direction}
+                    initial={{ opacity: 0, x: direction * 60 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: direction * -60 }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+                    className="bg-white rounded-[2rem] shadow-xl border-2 border-gray-100 overflow-hidden"
+                  >
+                    {page === 0 ? (
+                      /* ── COVER PAGE ── */
+                      <div className="flex flex-col">
+                        {/* Hero banner */}
+                        <div className={`w-full h-52 md:h-72 bg-gradient-to-br ${c.bg} flex flex-col items-center justify-center relative overflow-hidden`}>
+                          <div className="absolute inset-0 opacity-20"
+                            style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}
+                          />
+                          <motion.div
+                            animate={{ rotate: [0, 5, -5, 0] }}
+                            transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
+                          >
+                            <BookOpen className="w-20 h-20 md:w-28 md:h-28 text-white drop-shadow-xl" />
+                          </motion.div>
+                          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/30 to-transparent" />
+                        </div>
+
+                        {/* Cover info */}
+                        <div className="p-6 md:p-8 flex flex-col gap-5">
+                          <div className="text-center">
+                            <p className={`text-sm font-bold uppercase tracking-widest ${c.text} mb-1`}>Kisah Nabi</p>
+                            <h2 className="text-4xl md:text-5xl font-black text-gray-800 leading-tight" style={{ fontFamily: '"Nunito", "Comic Sans MS", sans-serif' }}>
+                              {selectedStory.name}
+                            </h2>
                           </div>
-                        )
-                     })()}
-                   </div>
-                 )}
-                 <div className="mt-auto pt-6 text-left text-gray-400 font-bold border-t border-gray-200/50">Hal {page * 2 + 1}</div>
-              </div>
 
-              {/* Right Page (Illustration or 2nd Paragraph) */}
-              <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col relative z-10 shadow-[inset_20px_0_20px_-20px_rgba(0,0,0,0.05)] bg-[#fdfaf6]">
-                 {page === 0 ? (
-                   // Illustration and Hikmah
-                   <div className="flex flex-col h-full">
-                     <div className={`w-full h-48 md:h-64 border-8 border-white rounded-[2rem] overflow-hidden shadow-lg mb-6 rotate-1 hover:rotate-0 transition-transform bg-gradient-to-br ${getColorClass(selectedStory.themeColor).split(' ').find(c => c.startsWith('from-'))} ${getColorClass(selectedStory.themeColor).split(' ').find(c => c.startsWith('to-'))} flex items-center justify-center relative`}>
-                        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,theme(colors.white)_10%,transparent_100%)] bg-[length:20px_20px]"></div>
-                        <Star className="absolute top-4 left-4 w-12 h-12 text-white/50 animate-pulse" />
-                        <BookOpen className="w-24 h-24 text-white drop-shadow-xl" />
-                        <span className="absolute bottom-[-10px] right-2 text-9xl font-arabic text-white/20 select-none">{selectedStory.name.charAt(0)}</span>
-                     </div>
-                     <div className="bg-pink-50 border-4 border-pink-200 p-5 rounded-3xl mt-auto shadow-sm relative">
-                       <div className="absolute -top-5 -left-5 bg-pink-400 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md rotate-12">
-                         <Heart className="w-5 h-5 fill-white" />
-                       </div>
-                       <h4 className="font-black text-pink-700 mb-2 ml-4">Hikmah Cerita:</h4>
-                       <p className="text-pink-900 font-medium text-sm md:text-base leading-relaxed">{selectedStory.hikmah}</p>
-                     </div>
-                   </div>
-                 ) : (
-                   // Right Page Text
-                   <div className="flex flex-col h-full relative">
-                      {(() => {
-                        const paragraphs = selectedStory.description.split('\n').filter(p => p.trim());
-                        const rightPara = paragraphs[(page - 1) * 2 + 1];
-                        return (
-                          <div className="prose prose-lg pt-4 md:pt-8 text-slate-800 leading-relaxed font-medium relative z-10">
-                            {rightPara ? <p>{rightPara}</p> : null}
+                          <div className={`flex gap-3 ${c.light} rounded-2xl p-4 border-2 ${c.border}`}>
+                            <div className="flex-1 flex items-center gap-2">
+                              <MapPin className={`w-5 h-5 ${c.text} shrink-0`} />
+                              <div>
+                                <p className="text-xs text-gray-400 font-semibold">Diutus di</p>
+                                <p className="font-black text-gray-700 text-sm md:text-base">{selectedStory.tmp}</p>
+                              </div>
+                            </div>
+                            <div className="w-px bg-gray-200" />
+                            <div className="flex-1 flex items-center gap-2">
+                              <Calendar className="w-5 h-5 text-amber-500 shrink-0" />
+                              <div>
+                                <p className="text-xs text-gray-400 font-semibold">Usia</p>
+                                <p className="font-black text-gray-700 text-sm md:text-base">{selectedStory.usia} Tahun</p>
+                              </div>
+                            </div>
                           </div>
-                        )
-                     })()}
-                   </div>
-                 )}
-                 <div className="mt-auto pt-6 text-right text-gray-400 font-bold border-t border-gray-200/50">Hal {page * 2 + 2}</div>
-              </div>
-            </div>
 
-            {/* Pagination Controls outside the book */}
-            {(() => {
-               const paragraphs = selectedStory.description.split('\n').filter(p => p.trim());
-               const totalBookPages = Math.ceil(paragraphs.length / 2) + 1; // 1 cover page
-               return (
-                 <div className="flex justify-center items-center gap-4 w-full">
-                   <button 
-                     onClick={() => setPage(p => Math.max(0, p - 1))}
-                     disabled={page === 0}
-                     className="bg-amber-400 hover:bg-amber-500 text-amber-900 px-6 md:px-8 py-3 md:py-4 rounded-full font-black text-lg disabled:opacity-50 transition-colors shadow-lg border-b-4 border-amber-600 disabled:border-amber-400 disabled:translate-y-1 active:translate-y-1 active:border-b-0"
-                   >
-                     ← Balik Halaman
-                   </button>
-                   <span className="hidden md:block font-bold text-sky-800 bg-white px-4 py-2 rounded-full border-2 border-sky-200">
-                     Lebar {page + 1}/{totalBookPages}
-                   </span>
-                   <button 
-                     onClick={() => setPage(p => Math.min(totalBookPages - 1, p + 1))}
-                     disabled={page >= totalBookPages - 1}
-                     className="bg-sky-400 hover:bg-sky-500 text-sky-900 px-6 md:px-8 py-3 md:py-4 rounded-full font-black text-lg disabled:opacity-50 transition-colors shadow-lg border-b-4 border-sky-600 disabled:border-sky-400 disabled:translate-y-1 active:translate-y-1 active:border-b-0"
-                   >
-                     Halaman Lanjut →
-                   </button>
-                 </div>
-               )
-            })()}
-          </motion.div>
-        )}
+                          <div className="bg-pink-50 border-2 border-pink-200 rounded-2xl p-4 flex gap-3 items-start">
+                            <Heart className="w-5 h-5 text-pink-500 fill-pink-400 shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-xs font-bold text-pink-500 uppercase tracking-wide mb-1">Hikmah Cerita</p>
+                              <p className="text-gray-700 font-semibold text-sm md:text-base leading-relaxed">{selectedStory.hikmah}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-center">
+                            <div className="flex gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-300" />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* ── TEXT PAGE ── */
+                      <div className="flex flex-col">
+                        {/* Page header strip */}
+                        <div className={`w-full px-6 py-3 bg-gradient-to-r ${c.bg} flex items-center justify-between`}>
+                          <p className="text-white/80 text-xs font-bold uppercase tracking-widest">Nabi {selectedStory.name}</p>
+                          <div className="flex gap-1">
+                            {[...Array(3)].map((_, i) => (
+                              <Star key={i} className="w-3 h-3 text-white/60 fill-white/40" />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Text content */}
+                        <div className="px-6 md:px-10 py-6 md:py-8">
+                          <p
+                            className="text-gray-700 text-[1.1rem] md:text-[1.2rem] leading-[1.75] md:leading-[1.8] font-normal tracking-[0.01em] text-left mx-auto"
+                            style={{
+                              fontFamily: '"Nunito", "Segoe UI", system-ui, sans-serif',
+                              wordSpacing: '0.04em',
+                              maxWidth: '60ch',
+                            }}
+                          >
+                            {paragraphs[page - 1]}
+                          </p>
+                        </div>
+
+                        {/* Page footer */}
+                        <div className={`mx-6 mb-6 pt-4 border-t-2 ${c.border} flex justify-between items-center`}>
+                          <p className="text-xs text-gray-400 font-semibold">Halaman {page} dari {totalPages - 1}</p>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Navigation buttons */}
+              <div className="w-full max-w-2xl flex items-center justify-between gap-3">
+                <motion.button
+                  whileTap={{ scale: 0.93 }}
+                  onClick={goPrev}
+                  disabled={page === 0}
+                  className="flex items-center gap-2 bg-white border-2 border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-3 rounded-2xl font-bold text-base shadow transition-all"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline">Sebelumnya</span>
+                </motion.button>
+
+                {/* Dot indicators */}
+                <div className="flex gap-1.5 flex-wrap justify-center max-w-[200px]">
+                  {Array.from({ length: Math.min(totalPages, 10) }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setDirection(i > page ? 1 : -1); setPage(i); }}
+                      className={`w-2.5 h-2.5 rounded-full transition-all ${i === page ? `bg-gradient-to-br ${c.bg} scale-125` : 'bg-gray-200 hover:bg-gray-300'}`}
+                    />
+                  ))}
+                  {totalPages > 10 && <span className="text-xs text-gray-400 font-bold self-center">+{totalPages - 10}</span>}
+                </div>
+
+                <motion.button
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => goNext(totalPages)}
+                  disabled={page >= totalPages - 1}
+                  className={`flex items-center gap-2 ${c.btn} text-white disabled:opacity-40 disabled:cursor-not-allowed px-5 py-3 rounded-2xl font-bold text-base shadow-lg border-b-4 ${c.btnBorder} active:border-b-0 active:translate-y-0.5 transition-all`}
+                >
+                  <span className="hidden sm:inline">Selanjutnya</span>
+                  <ChevronRight className="w-5 h-5" />
+                </motion.button>
+              </div>
+
+            </div>
+          );
+        })()}
       </main>
     </div>
   );
